@@ -167,7 +167,11 @@ Inductive winner : Set :=
 | second
 | third
 | aiko.
-Definition play (t1 t2 t3 : janken) : winner := aiko.
+Definition play (t1 t2 t3 : janken) : winner :=
+  if andb (wins t1 t2) (wins t1 t3) then first else
+    if andb (wins t2 t1) (wins t1 t3) then second else
+      if andb (wins t3 t1) (wins t3 t2) then third else
+        aiko.
 End Play3.
 
 (* 練習問題 2.2 Play3.play を正しく定義せよ．*)
@@ -260,7 +264,10 @@ Eval compute in remove_head_space " hello".
 (* = "hello" *)
 (* : string  *)
 
-Fixpoint remove_head_spaces (s : string) : string := "".
-(* 先頭の空白を全て取る *)
+Fixpoint remove_head_spaces (s : string) : string :=
+match s with
+| String " " s' => remove_head_spaces s'
+| _ => s
+end.
 
 (* 練習問題 2.4 remove head spaces を正しく定義せよ．*)

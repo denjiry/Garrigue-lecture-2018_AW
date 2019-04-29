@@ -219,7 +219,7 @@ Proof.
 Qed.
 (* and_comm is defined *)
 
-Theorem or_comm : P \/ Q -> Q \/P.
+Theorem or_comm : P \/ Q -> Q \/ P.
 Proof.
   intros pq.
   destruct pq as [p | q]. (* 場合が二つある *)
@@ -250,24 +250,60 @@ Variables P Q R : Prop.
 
 Theorem imp_trans : (P -> Q) -> (Q -> R) -> P -> R.
 Proof.
-Admitted.
+  intros pq.
+  intros qr.
+  intros p.
+  apply qr.
+  apply pq.
+  assumption.
+Qed.
+
 Theorem not_false : ~False.
 Proof.
-Admitted.
+  intros n.
+  assumption.
+Qed.
+
 Theorem double_neg : P -> ~~P.
 Proof.
-Admitted.
+  intros p np.
+  apply np.
+  assumption.
+Qed.
+
 Theorem contraposition : (P -> Q) -> ~Q -> ~P.
 Proof.
-Admitted.
+  intros pq ngq ng.
+  apply ngq. apply pq. assumption.
+Qed.
+
 Theorem and_assoc : P /\ (Q /\ R) -> (P /\ Q) /\ R.
 Proof.
-Admitted.
+  intros pqr.
+  destruct pqr as [p qr].
+  destruct qr as [q r].
+  split.
+  split. assumption.
+  assumption.
+  assumption.
+Qed.
+  
 Theorem and_distr : P /\ (Q \/ R) -> (P /\ Q) \/ (P /\ R).
 Proof.
-Admitted.
-Theorem absurd : P -> ~P -> Q.
-Proof.
-Admitted.
+  intros pqr.
+  destruct pqr as [p qr].
+  destruct qr as [q | r].  
+  left. apply conj. apply p. apply q.
 
+  right. apply conj. apply p. apply r.
+Qed.          
+
+Theorem absurd : P -> not P -> Q.
+Proof.
+  intros p.
+  unfold not.
+  intros png.
+  destruct png.
+  assumption.
+Qed.
 End Coq2.
