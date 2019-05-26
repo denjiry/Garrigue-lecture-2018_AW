@@ -223,8 +223,8 @@ Theorem or_comm : P \/ Q -> Q \/ P.
 Proof.
   intros pq.
   destruct pq as [p | q]. (* 場合が二つある *)
-  right; assumption.
-  left; assumption.
+  - right; assumption.
+  - left; assumption.
 Qed.
 (* or_comm is defined *)
 End Destruct.
@@ -294,7 +294,6 @@ Proof.
   destruct pqr as [p qr].
   destruct qr as [q | r].  
   left. apply conj. apply p. apply q.
-
   right. apply conj. apply p. apply r.
 Qed.          
 
@@ -305,5 +304,21 @@ Proof.
   intros png.
   destruct png.
   assumption.
+Qed.
+Theorem absurd' : P -> not P -> Q.
+Proof.
+  intros p notp.
+  elimtype False.
+  apply notp.
+  assumption.
+Qed.
+Theorem absurd'' : P -> not P -> Q.
+Proof.
+  intros p notp.
+  destruct (notp p).
+Qed.
+Theorem absurd''' : P -> not P -> Q.
+Proof.
+  contradiction.
 Qed.
 End Coq2.

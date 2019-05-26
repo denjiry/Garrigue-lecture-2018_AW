@@ -50,10 +50,10 @@ Proof.
   apply classic.
   intros nen.
   apply np; clear np.
-  intros a; apply classic.
+  intros a;apply classic.
   intros np.
   apply nen.
-  exists a; assumption.
+  exists a. assumption.
 Qed.
 
 (* End Negation. *)
@@ -69,8 +69,9 @@ Variables P Q : A -> Prop.
 Theorem exists_postpone :
 (exists x, forall y, R x y) -> (forall y, exists x, R x y).
 Proof.
-Admitted.
-
+  intros.
+  exists y.
+  Admitted.
 Theorem or_exists : (exists x, P x) \/ (exists x, Q x) -> exists x, P x \/ Q x.
 Proof.
 Admitted.
@@ -81,8 +82,20 @@ Theorem remove_c : forall a,
 (forall x y, Q x -> Q y) ->
 (forall c, ((exists x, P x) -> P c) -> Q c) -> Q a.
 Proof.
-Admitted.
-
+  intros a HQxy H.
+  apply classic.
+  intros HnQa.
+  apply HnQa.
+  apply H.
+  intros [x HP].
+  apply classic.
+  intros HnPa.
+  apply HnQa.
+  apply HQxy with (x:=x).
+  apply  H.
+  intros.
+  assumption.
+Qed.
 End Coq3.
 
 
