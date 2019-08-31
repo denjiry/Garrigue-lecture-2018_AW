@@ -115,6 +115,11 @@ Inductive odd : nat -> Prop :=
 
 Theorem even_odd : forall n, even n -> odd (S n).
 Proof.
+  intros n.
+  induction n.
+  intros ev0. apply odd_1.
+  intros evsn. (* apply IHn. apply odd_SS. *)
+  
 Admitted.
 
 Theorem odd_even : forall n, odd n -> even (S n).
@@ -228,10 +233,14 @@ Module Ex4_2.
 Require Import ZArith.
 Open Scope Z_scope.
 
-(*
-Fixpoint eval_poly (p : list Z) (x : Z) := ...
+
+Fixpoint eval_poly (p : list Z) (x : Z) :=
+  match p with
+  | nil => 0
+  | z :: p' => z + x * (eval_poly p' x)
+  end.
+
 Eval compute in eval_poly (1 :: 2 :: 3 :: nil) 5. (* = 1 + 2*5 + 3*5*5 *)
- *)
 
 End Ex4_2.
 
@@ -248,6 +257,7 @@ Proof.
   intros.
   apply H.
   split; assumption.
+  unfold and'.
   intros pq X pqx.
   destruct pq as [p q].
   apply pqx; assumption.
@@ -259,10 +269,25 @@ Admitted.
 
 Theorem False'_ok : False' <-> False.
 Proof.
-Admitted.
+split. intros.
+unfold False' in H.
+apply H.
+(* intros []. *)
+intros F.
+apply False_ind.
+assumption.
+Qed.
 
 Theorem Equal'_ok : forall T x y, Equal' T x y <-> x = y.
 Proof.
-Admitted.
-
+split.
+unfold Equal'.
+intros xy.
+apply xy.
+reflexivity.
+intros xy T'.
+split.
+rewrite xy. intros. assumption.
+rewrite xy. intros. assumption.
+Qed.
 (* —ûK–â‘è 3.2 orf okAFalsef ok ‚¨‚æ‚Ñ Equalf ok ‚ğØ–¾‚¹‚æ *)
