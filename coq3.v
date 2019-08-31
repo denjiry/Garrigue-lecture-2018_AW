@@ -18,8 +18,8 @@ Print ms.
 End Socrates.
 
 (*
-Í ‚Æ Î ‚ÌŠÔ‚É De Morgan ‚Ì–@‘¥‚ª‚È‚è‚½‚ÂD‘O‰ñ‚Æ“¯—l‚ÉCÎ ‚ð“±o‚µ‚æ‚¤‚Æ‚µ‚½‚Æ‚«‚É classic
-‚ðŽg‚í‚È‚¯‚ê‚Î‚È‚ç‚È‚¢D
+âˆ€ ã¨ âˆƒ ã®é–“ã« De Morgan ã®æ³•å‰‡ãŒãªã‚ŠãŸã¤ï¼Žå‰å›žã¨åŒæ§˜ã«ï¼Œâˆƒ ã‚’å°Žå‡ºã—ã‚ˆã†ã¨ã—ãŸã¨ãã« classic
+ã‚’ä½¿ã‚ãªã‘ã‚Œã°ãªã‚‰ãªã„ï¼Ž
 *)
 
 Section Laws.
@@ -28,7 +28,7 @@ Variables (A:Set) (P Q:A->Prop).
 
 Lemma DeMorgan2 : (~ exists x, P x) -> forall x, ~ P x.
 Proof.
-  intros N x Px.
+  intros N. intros x. intros Px.
   apply N.
   exists x.
   apply Px.
@@ -37,7 +37,7 @@ Qed.
 Theorem exists_or : (exists x, P x \/ Q x) -> (exists x, P x) \/ (exists x, Q x).
 Proof.
   intros H.
-  destruct H as [x [p|q]]. (* ’†‚Ü‚Å”j‰ó *)
+  destruct H as [x [p|q]]. (* ä¸­ã¾ã§ç ´å£Š *)
   left. exists x. assumption.
   right. exists x. assumption.
 Qed.
@@ -49,8 +49,8 @@ Proof.
   intros np.
   apply classic.
   intros nen.
-  apply np; clear np.
-  intros a;apply classic.
+  apply np. clear np.
+  intros a. apply classic.
   intros np.
   apply nen.
   exists a. assumption.
@@ -59,7 +59,7 @@ Qed.
 (* End Negation. *)
 End Laws.
 
-(* —ûK–â‘è 1.1 ˆÈ‰º‚Ì’è—‚ð Coq ‚ÅØ–¾‚¹‚æD*)
+(* ç·´ç¿’å•é¡Œ 1.1 ä»¥ä¸‹ã®å®šç†ã‚’ Coq ã§è¨¼æ˜Žã›ã‚ˆï¼Ž*)
 Section Coq3.
 
 Variable A : Set.
@@ -70,12 +70,19 @@ Theorem exists_postpone :
 (exists x, forall y, R x y) -> (forall y, exists x, R x y).
 Proof.
   intros.
-  exists y.
-  Admitted.
+  destruct  H as [x].
+  exists x.
+  apply (H y).
+Qed.
+
 Theorem or_exists : (exists x, P x) \/ (exists x, Q x) -> exists x, P x \/ Q x.
 Proof.
-Admitted.
-
+  intros H.
+  destruct H as [p|q].
+  destruct p. exists x. left. assumption.
+  destruct q. exists x. right. assumption.
+Qed.  
+   
 Hypothesis classic : forall P, ~~P -> P.
 
 Theorem remove_c : forall a,
@@ -96,12 +103,24 @@ Proof.
   intros.
   assumption.
 Qed.
+
+
+Theorem remove_c' : forall a,
+(forall x y, Q x -> Q y) ->
+(forall c, ((exists x, P x) -> P c) -> Q c) -> Q a.
+Proof.
+  intros a HQ HPPQ.
+apply classic; intros qa.
+apply qa, HPPQ.
+intros [x px]. elim qa.
+apply (HQ x). apply HPPQ. auto.
+Qed.
 End Coq3.
 
 
-(* 2 ‹A”[–@ *)
+(* 2 å¸°ç´æ³• *)
 
-(*Coq ‚Åƒf[ƒ^Œ^‚ð’è‹`‚·‚é‚ÆCŽ©“®“I‚É‹A”[–@‚ÌŒ´—‚ª¶¬‚³‚ê‚éD*)
+(*Coq ã§ãƒ‡ãƒ¼ã‚¿åž‹ã‚’å®šç¾©ã™ã‚‹ã¨ï¼Œè‡ªå‹•çš„ã«å¸°ç´æ³•ã®åŽŸç†ãŒç”Ÿæˆã•ã‚Œã‚‹ï¼Ž*)
 Module MyNat.
 Inductive nat : Set := O : nat | S : nat -> nat.
 (* nat is defined
@@ -115,70 +134,102 @@ Inductive nat : Set := O : nat | S : nat -> nat.
   P O ->
   (forall n : nat, P n -> P (S n)) ->
   forall n : nat, P n
-‚à‚Á‚Æ•ª‚©‚è‚â‚·‚­‘‚­‚ÆCnat ind ‚ÌŒ^‚Í ÍP, P 0 ¨ (Ín, P n ¨ P (S n)) ¨ (Ín, P n) ‚Å
-‚ ‚éD‘¦‚¿ P ‚Í 0 ‚Å‚È‚è‚½‚¿C”CˆÓ‚Ì n ‚É‚Â‚¢‚Ä P ‚ª n ‚Å‚È‚è‚½‚Ä‚ÎCn + 1 ‚Å‚à‚à‚È‚è‚½‚Â‚±
-‚Æ‚ªØ–¾‚Å‚«‚ê‚ÎC”CˆÓ‚Ì n ‚É‚Â‚¢‚Ä P ‚ª‚È‚è‚½‚ÂD
-‚¿‚È‚Ý‚ÉCnat rec ‚Ì’è‹`‚ðŒ©‚é‚ÆC *)
+ã‚‚ã£ã¨åˆ†ã‹ã‚Šã‚„ã™ãæ›¸ãã¨ï¼Œnat ind ã®åž‹ã¯ âˆ€P, P 0 â†’ (âˆ€n, P n â†’ P (S n)) â†’ (âˆ€n, P n) ã§
+ã‚ã‚‹ï¼Žå³ã¡ P ã¯ 0 ã§ãªã‚ŠãŸã¡ï¼Œä»»æ„ã® n ã«ã¤ã„ã¦ P ãŒ n ã§ãªã‚ŠãŸã¦ã°ï¼Œn + 1 ã§ã‚‚ã‚‚ãªã‚ŠãŸã¤ã“
+ã¨ãŒè¨¼æ˜Žã§ãã‚Œã°ï¼Œä»»æ„ã® n ã«ã¤ã„ã¦ P ãŒãªã‚ŠãŸã¤ï¼Ž
+ã¡ãªã¿ã«ï¼Œnat rec ã®å®šç¾©ã‚’è¦‹ã‚‹ã¨ï¼Œ *)
 Check nat_rec.
 (* nat_rec
    : forall P : nat -> Set,
    P O ->
    (forall n : nat, P n -> P (S n)) ->
    forall n : nat, P n
-P ‚ª Prop ‚Å‚Í‚È‚­ Set ‚ð•Ô‚·‚±‚ÆˆÈŠOC‘S‚­“¯‚¶‚Å‚ ‚éD
-–{“–‚Ì’è‹`‚ðŒ©‚é‚ÆC
+P ãŒ Prop ã§ã¯ãªã Set ã‚’è¿”ã™ã“ã¨ä»¥å¤–ï¼Œå…¨ãåŒã˜ã§ã‚ã‚‹ï¼Ž
+æœ¬å½“ã®å®šç¾©ã‚’è¦‹ã‚‹ã¨ï¼Œ
 *)
 Print nat_rect.
-(* nat_rect =
-   fun (P : nat -> Type) (f : P O) (f0 : forall n : nat, P n -> P (S n)) => 
-fix F (n : nat) : P n :=
-match n as n0 return (P n0) with
-| O => f
-| S n0 => f0 n0 (F n0)
-end
+(* Definition nat_rect' := *)
+(*    fun (P : nat -> Type) (f : P O) (f0 : forall n : nat, P n -> P (S n)) =>  *)
+(* fix F (n : nat) : P n := *)
+(* match n  return (P n) with *)
+(* | O => f *)
+(* | S n0 => f0 n0 (F n0) *)
+(* end. *)
 
-ŽÀ‚Í•’Ê‚ÌÄ‹AŠÖ”“¯—lCfix ‚Æ match ‚ðŽg‚Á‚Ä’è‹`‚³‚ê‚Ä‚¢‚éD*)
-End MyNat. (* •’Ê‚Ì nat ‚É–ß‚é *)
+(*
+å®Ÿã¯æ™®é€šã®å†å¸°é–¢æ•°åŒæ§˜ï¼Œfix ã¨ match ã‚’ä½¿ã£ã¦å®šç¾©ã•ã‚Œã¦ã„ã‚‹ï¼Ž*)
+End MyNat. (* æ™®é€šã® nat ã«æˆ»ã‚‹ *)
 
 Definition plus' : nat -> nat -> nat.
   intros m n.
   induction m.
-  exact n. (* n ‚ð•Ô‚· *)
-  exact (S IHm). (* ‹A”[–@‚É‚æ‚Á‚Ä“¾‚ç‚ê‚½ IHm ‚ÌŒãŽÒ‚ð•Ô‚· *)
-Defined. (* ŒvŽZ‚ð‰Â”\‚É‚·‚é‚½‚ß‚É Defined ‚Å•Â‚¶‚é *)
+  exact n. (* n ã‚’è¿”ã™ *)
+  exact (S IHm). (* å¸°ç´æ³•ã«ã‚ˆã£ã¦å¾—ã‚‰ã‚ŒãŸ IHm ã®å¾Œè€…ã‚’è¿”ã™ *)
+Defined. (* è¨ˆç®—ã‚’å¯èƒ½ã«ã™ã‚‹ãŸã‚ã« Defined ã§é–‰ã˜ã‚‹ *)
 
 Print plus'.
 (* fun m n : nat => nat_rec (fun _ : nat => nat) n (fun _ IHm : nat => S IHm) m *)
 
-Eval compute in plus' 2 3.
+Eval compute in plus'.
 (* = 5 *)
+Definition mult''' :=
+        fun m n : nat =>
+       (fix F (n0 : nat) : nat :=
+          match n0 with
+          | 0 => 0
+          | S n1 => n + (F n1)
+          end) m.
 
+Eval compute in (mult''' 3 2).
 Lemma plus_assoc : forall m n p, m + (n + p) = (m + n) + p.
 Proof.
   intros m n p.
   induction m.
-  simpl. (* ŒvŽZ‚·‚é *)
-  SearchPattern (?X = ?X). (* ”½ŽË—¦‚ð’²‚×‚é *)
+  simpl. (* è¨ˆç®—ã™ã‚‹ *)
+  SearchPattern (?X = ?X). (* åå°„çŽ‡ã‚’èª¿ã¹ã‚‹ *)
    (* eq_refl: forall (A : Type) (x : A), x = x  *)
   apply eq_refl.
   simpl.
-  rewrite IHm. (* ‘ã“ü‚ðs‚¤ *)
-  reflexivity. (* apply eq_refl ‚Æ“¯‚¶ *)
+  rewrite IHm. (* ä»£å…¥ã‚’è¡Œã† *)
+  reflexivity. (* apply eq_refl ã¨åŒã˜ *)
 Qed.
 
-(* —ûK–â‘è 2.1 ˆÈ‰º‚Ì’è—‚ðØ–¾‚¹‚æD*)
+(* ç·´ç¿’å•é¡Œ 2.1 ä»¥ä¸‹ã®å®šç†ã‚’è¨¼æ˜Žã›ã‚ˆï¼Ž*)
 Theorem plus_0 : forall n, n + 0 = n.
 Proof.
-Admitted.
+  intros n.
+  induction n.
+  simpl. reflexivity.
+  simpl. rewrite IHn. reflexivity.
+Qed.
+
 Theorem plus_m_Sn : forall m n, m + (S n) = S (m + n).
 Proof.
-Admitted.
+  intros m n.
+  induction m.
+  simpl. reflexivity.
+  simpl. rewrite -> IHm. reflexivity.
+Qed.
+
 Theorem plus_comm : forall m n, m + n = n + m.
 Proof.
-Admitted.
+  intros m n.
+  induction n.
+  simpl. apply plus_0.
+  rewrite plus_m_Sn. simpl. rewrite IHn. reflexivity.
+Qed.
+
 Theorem plus_distr : forall m n p, (m + n) * p = m * p + n * p.
 Proof.
-Admitted.
+  intros m n p.
+  induction m. simpl. reflexivity.
+  simpl. rewrite -> IHm. apply plus_assoc. 
+Qed.
+
 Theorem mult_assoc : forall m n p, m * (n * p) = (m * n) * p.
 Proof.
-Admitted.
+  intros m n p.
+  induction m.
+  simpl. reflexivity.
+  simpl. rewrite IHm. rewrite plus_distr. reflexivity.
+Qed.                              
